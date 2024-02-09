@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  algolabs_backend:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/algolabs_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - algolab_database_mongo
+    container_name: algolabs_backend
+    networks:
+      - algolabs_net
+
+  algolab_database_mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    container_name: algolab_database_mongo
+    networks:
+      - algolabs_net
+
+volumes:
+  mongodb_data:
+
+networks:
+  algolabs_net:
