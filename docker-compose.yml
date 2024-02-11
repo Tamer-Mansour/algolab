@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  piston:
+    container_name: piston-api
+    image: ghcr.io/engineer-man/piston
+    networks:
+      - algolabs_net
+    ports:
+      - "2000:2000"
+    volumes:
+      - /path/to/piston_data:/piston
+
+
   algolabs_backend:
     build: .
     ports:
@@ -9,23 +20,23 @@ services:
       - .:/algolabs_backend
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
-      - algolab_database_mongo
+      - algolab_database
     container_name: algolabs_backend
     networks:
       - algolabs_net
 
-  algolab_database_mongo:
+  algolab_database:
     image: mongo
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
-    container_name: algolab_database_mongo
+      - algolab_database:/data/db
+    container_name: algolab_database
     networks:
       - algolabs_net
 
 volumes:
-  mongodb_data:
+  algolab_database:
 
 networks:
   algolabs_net:
