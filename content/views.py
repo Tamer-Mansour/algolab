@@ -8,4 +8,4 @@ from rest_framework.response import Response
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def hello_world(request):
-    return Response({'message': 'Hello World!'})
+    return Response({'message': 'Hello from content'})
