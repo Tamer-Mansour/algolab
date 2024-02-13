@@ -60,8 +60,23 @@ def list_chapters_with_details(request):
         serialized_data.append(chapter_data)
     return Response(serialized_data)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_chapter_with_challenges_by_id(request, chapter_id):
+    try:
+        chapter = Chapter.objects.prefetch_related('codingchallenge_set').get(pk=chapter_id)
+        chapter_data = ChapterSerializer(chapter).data
+        coding_challenges_data = CodingChallengeSerializer(chapter.codingchallenge_set.all(), many=True).data
+        chapter_data['challenges'] = coding_challenges_data
+        return Response(chapter_data)
+    except Chapter.DoesNotExist:
+        return Response({'error': 'Chapter not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_chapter_by_id(request, chapter_id):
     try:
         chapter = Chapter.objects.get(pk=chapter_id)
@@ -129,6 +144,7 @@ def add_coding_challenge(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_coding_challenges(request):
     try:
         if request.method == 'GET':
@@ -140,6 +156,7 @@ def get_coding_challenges(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_coding_challenge_by_id(request, challenge_id):
     try:
         coding_challenge = CodingChallenge.objects.get(pk=challenge_id)

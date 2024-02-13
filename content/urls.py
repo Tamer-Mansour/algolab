@@ -9,6 +9,8 @@ urlpatterns = [
     path('chapters/<int:chapter_id>/', get_chapter_by_id, name='get_chapter_by_id'),
     path('chapters/<int:chapter_id>/edit/', edit_chapter, name='edit_chapter'),
     path('chapters/<int:chapter_id>/delete/', delete_chapter, name='delete_chapter'),
+    path('chapters/<int:chapter_id>/challenges/', get_chapter_with_challenges_by_id,
+         name='get_chapter_with_challenges_by_id'),
 
     path('coding_challenges/add/', add_coding_challenge, name='add_coding_challenge'),
     path('coding_challenges/', get_coding_challenges, name='get_coding_challenges'),
