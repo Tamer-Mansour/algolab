@@ -26,8 +26,9 @@ VERIFYING_KEY = open('./algolabs/public.pem').read()
 DEBUG = True
 hostname = socket.gethostname()
 IPAddr = socket.gethostbyname(hostname)
-print('IPAddr:', IPAddr)
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 AUTH_USER_MODEL = 'users.User'
 # Application definition
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'piston_wrapper',
+    'corsheaders',
     'content'
 ]
 
@@ -73,7 +75,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
+
+
 
 ROOT_URLCONF = 'algolabs.urls'
 
@@ -107,10 +112,10 @@ WSGI_APPLICATION = 'algolabs.wsgi.application'
 # }
 
 DATABASES = {
-       'default': {
-           'ENGINE': 'djongo',
-           'NAME': 'algolab_database',
-       }
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'algolab_database',
+    }
 }
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
