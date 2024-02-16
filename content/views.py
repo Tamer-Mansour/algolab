@@ -12,12 +12,11 @@ from users.models import User
 
 
 @api_view(['POST'])
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def add_chapter(request):
-    user = get_user_from_token(request.headers)
-    if user.role != User.ADMIN:
-        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    # user = get_user_from_token(request.headers)
+    # if user.role != User.ADMIN:
+    #     return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
     try:
         if request.method == 'POST':
             title = request.data.get('title')
@@ -60,6 +59,7 @@ def list_chapters_with_details(request):
         serialized_data.append(chapter_data)
     return Response(serialized_data)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_chapter_with_challenges_by_id(request, chapter_id):
@@ -89,12 +89,13 @@ def get_chapter_by_id(request, chapter_id):
 
 
 @api_view(['PUT'])
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
+# @authentication_classes([UserAuthentication])
+# @permission_classes([IsAuthenticated])
 def edit_chapter(request, chapter_id):
-    user = get_user_from_token(request.headers)
-    if user.role != User.ADMIN:
-        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    # user = get_user_from_token(request.headers)
+    # if user.role != User.ADMIN:
+    #     return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
     try:
         chapter = Chapter.objects.get(pk=chapter_id)
         if request.method == 'PUT':
@@ -109,12 +110,13 @@ def edit_chapter(request, chapter_id):
 
 
 @api_view(['DELETE'])
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
+# @authentication_classes([UserAuthentication])
+# @permission_classes([IsAuthenticated])
 def delete_chapter(request, chapter_id):
-    user = get_user_from_token(request.headers)
-    if user.role != User.ADMIN:
-        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    # user = get_user_from_token(request.headers)
+    # if user.role != User.ADMIN:
+    #     return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
     try:
         chapter = Chapter.objects.get(pk=chapter_id)
         if request.method == 'DELETE':
@@ -127,18 +129,17 @@ def delete_chapter(request, chapter_id):
 
 
 @api_view(['POST'])
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def add_coding_challenge(request):
-    user = get_user_from_token(request.headers)
-    if user.role != User.ADMIN:
-        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
     try:
         if request.method == 'POST':
             serializer = CodingChallengeSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                # If serializer is not valid, return detailed validation errors
+                return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -169,12 +170,13 @@ def get_coding_challenge_by_id(request, challenge_id):
 
 
 @api_view(['PUT'])
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([UserAuthentication])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def edit_coding_challenge(request, challenge_id):
-    user = get_user_from_token(request.headers)
-    if user.role != User.ADMIN:
-        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    # user = get_user_from_token(request.headers)
+    # if user.role != User.ADMIN:
+    #     return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
     try:
         coding_challenge = CodingChallenge.objects.get(pk=challenge_id)
         if request.method == 'PUT':

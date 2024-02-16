@@ -23,7 +23,7 @@ class CodingChallenge(models.Model):
     description = models.TextField()
     constrains = models.TextField()
     code = models.TextField()
-    function_signature = models.CharField(max_length=255)
+    function_signature = models.TextField()
     testcases = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
