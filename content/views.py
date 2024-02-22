@@ -62,6 +62,8 @@ def list_chapters_with_details(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+# @authentication_classes([UserAuthentication])
+# @permission_classes([IsAuthenticated])
 def get_chapter_with_challenges_by_id(request, chapter_id):
     try:
         chapter = Chapter.objects.prefetch_related('codingchallenge_set').get(pk=chapter_id)
@@ -206,3 +208,4 @@ def delete_coding_challenge(request, challenge_id):
         return Response({'error': 'Coding challenge not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

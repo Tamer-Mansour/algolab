@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'piston_wrapper',
+    'solutions',
     'corsheaders',
     'content'
 ]
@@ -76,6 +77,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    # 'algolabs.middleware.AuthMiddleware',
 ]
 
 

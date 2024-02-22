@@ -40,20 +40,36 @@ class UserRegistrationView(views.APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            success_message = {"message": "User registered successfully"}
+            return Response(success_message, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@authentication_classes([UserAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([UserAuthentication])
+# @permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_users(request):
-    user = get_user_from_token(request.headers)
-    if user.role == User.ADMIN:
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # user = get_user_from_token(request.headers)
+    # if user.role == User.ADMIN:
+    users = User.objects.all()
+    all_users = [
+        {
+            'id': user.id,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'role': user.role,
+            'created_at': user.created_at,
+            'updated_at': user.updated_at,
+        }
+        for user in users
+    ]
+    return Response(all_users, status=status.HTTP_200_OK)
+    # serializer = UserSerializer(users, many=True)
+    # return Response(serializer.data, status=status.HTTP_200_OK)
+    # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -72,17 +88,25 @@ def logout_user(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_users_by_role(request, role):
     try:
-        user = get_user_from_token(request.headers)
-        if user.role != User.ADMIN:
-            return Response({"error": "You are not authorized to perform this action."},
-                            status=status.HTTP_403_FORBIDDEN)
-
         users = User.objects.filter(role=role)
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Manually select the desired fields
+        users_data = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'role': user.role,
+                'created_at': user.created_at,
+                'updated_at': user.updated_at,
+            }
+            for user in users
+        ]
+        return Response(users_data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -104,17 +128,40 @@ def update_user(request, user_id):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def delete_user(request, user_id):
     try:
-        user = get_user_from_token(request.headers)
-        if user.role != User.ADMIN:
-            return Response({"error": "You are not authorized to perform this action."},
-                            status=status.HTTP_403_FORBIDDEN)
+        # user = get_user_from_token(request.headers)
+        # if user.role != User.ADMIN:
+        #     return Response({"error": "You are not authorized to perform this action."},
+        #                     status=status.HTTP_403_FORBIDDEN)
 
         user = User.objects.get(pk=user_id)
         user.delete()
         return Response({"message": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_by_id(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'role': user.role,
+            'created_at': user.created_at,
+            'updated_at': user.updated_at,
+        }
+        return Response(user_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:

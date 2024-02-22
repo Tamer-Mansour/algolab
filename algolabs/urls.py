@@ -22,5 +22,6 @@ urlpatterns = [
     # path('api-auth/', include('rest_framework.urls')),
     path('api/auth/', include('users.urls')),
     path('api/content/', include('content.urls')),
-    path('api/piston/', include('piston_wrapper.urls'))
+    path('api/piston/', include('piston_wrapper.urls')),
+    path('api/solutions/', include('solutions.urls'))
 ]
