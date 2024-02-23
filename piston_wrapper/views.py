@@ -23,10 +23,10 @@ def get_available_packages(request):
         return JsonResponse({"error": str(e)}, status=500, safe=False)
 
 
-# @authentication_classes([UserAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 def get_runtimes(request):
     runtimes_endpoint = PISTON_SERVER_BASE_URL + "runtimes"
     try:
@@ -36,11 +36,11 @@ def get_runtimes(request):
         return JsonResponse({"error": str(e)}, status=500, safe=False)
 
 
-# @authentication_classes([UserAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 def install_package(request):
     packages_endpoint = PISTON_SERVER_BASE_URL + "packages"
     try:
@@ -54,15 +54,15 @@ def install_package(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-# @authentication_classes([UserAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 @api_view(['DELETE'])
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 def uninstall_package(request):
-    # user = get_user_from_token(request.headers)
-    # if user.role != User.ADMIN:
-    #     return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    user = get_user_from_token(request.headers)
+    if user.role != User.ADMIN:
+        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
 
     packages_endpoint = PISTON_SERVER_BASE_URL + "packages"
     try:
