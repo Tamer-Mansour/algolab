@@ -21,8 +21,8 @@ class User(AbstractUser):
     ADMIN = 'admin'
     INSTRUCTOR = 'instructor'
     username = models.CharField(max_length=50, unique=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, null=True)
+    last_name = models.CharField(max_length=50, null=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=50)
     role = models.CharField(max_length=20, choices=ROLES)

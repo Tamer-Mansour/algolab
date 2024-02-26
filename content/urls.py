@@ -17,4 +17,10 @@ urlpatterns = [
     path('coding_challenges/<int:challenge_id>/', get_coding_challenge_by_id, name='get_coding_challenge_by_id'),
     path('coding_challenges/<int:challenge_id>/edit/', edit_coding_challenge, name='edit_coding_challenge'),
     path('coding_challenges/<int:challenge_id>/delete/', delete_coding_challenge, name='delete_coding_challenge'),
+
+    path('courses/add_course/', add_course, name='add_course'),
+    path('courses/update_course/<int:course_id>/', update_course, name='update_course'),
+    path('courses/delete_course/<int:course_id>/', delete_course, name='delete_course'),
+    path('courses/get_all_courses/', get_all_courses, name='get_all_courses'),
+    path('courses/get_course_by_id/<int:course_id>/', get_course_by_id, name='get_course_by_id'),
 ]

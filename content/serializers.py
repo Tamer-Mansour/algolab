@@ -12,3 +12,8 @@ class CodingChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodingChallenge
         fields = '__all__'
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = '__all__'

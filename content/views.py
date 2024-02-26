@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
-from .models import Chapter
+from .models import *
 from rest_framework import views, status
 from .serializers import *
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from users.Authentication import UserAuthentication
 from algolabs.config import get_user_from_token
 from users.models import User
+from django.shortcuts import get_object_or_404
+
 
 
 @authentication_classes([UserAuthentication])
@@ -227,3 +229,76 @@ def delete_coding_challenge(request, challenge_id):
         return Response({'error': 'Coding challenge not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def add_course(request):
+    user = get_user_from_token(request.headers)
+    if user.role != User.ADMIN:
+        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    try:
+        if request.method == 'POST':
+            serializer = CourseSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['PUT'])
+def update_course(request, course_id):
+    user = get_user_from_token(request.headers)
+    if user.role != User.ADMIN:
+        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    try:
+        course = get_object_or_404(Course, id=course_id)
+        serializer = CourseSerializer(instance=course, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])
+def delete_course(request, course_id):
+    user = get_user_from_token(request.headers)
+    if user.role != User.ADMIN:
+        return JsonResponse({"error": "You are not authorized to perform this action"}, status=403)
+    try:
+        course = get_object_or_404(Course, id=course_id)
+        course.delete()
+        return Response({"message": "Course deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_all_courses(request):
+    try:
+        courses = Course.objects.all()
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@authentication_classes([UserAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_course_by_id(request, course_id):
+    try:
+        course = get_object_or_404(Course, id=course_id)
+        serializer = CourseSerializer(course)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -161,10 +161,10 @@ def delete_user(request, user_id):
 @api_view(['GET'])
 def get_user_by_id(request, user_id):
     try:
-        user = get_user_from_token(request.headers)
-        if user.role != User.ADMIN:
-            return Response({"error": "You are not authorized to perform this action."},
-                            status=status.HTTP_403_FORBIDDEN)
+        # user = get_user_from_token(request.headers)
+        # if user.role != User.ADMIN:
+        #     return Response({"error": "You are not authorized to perform this action."},
+        #                     status=status.HTTP_403_FORBIDDEN)
         user = User.objects.get(pk=user_id)
         user_data = {
             'id': user.id,
