@@ -14,6 +14,7 @@ urlpatterns = [
     path('users/<int:user_id>/', get_user_by_id, name='get_user_by_id'),
     path('user/update/<int:user_id>/', update_user, name='update-user'),
     path('user/delete/<int:user_id>/', delete_user, name='delete-user'),
+    path('user/login-stats/', LoginStatsAPIView.as_view(), name='login-stats-api'),
 ]
 
 if settings.DEBUG:

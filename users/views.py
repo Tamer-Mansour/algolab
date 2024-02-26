@@ -187,3 +187,53 @@ def get_user_by_id(request, user_id):
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+from django.utils import timezone
+
+
+
+class LoginStatsAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Ensure that the authenticated user has the permission to view login stats
+        if request.user.role != User.ADMIN:
+            return Response({"error": "You are not authorized to perform this action."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Get all users
+            users = User.objects.all()
+
+            # Initialize a dictionary to store login data for each user
+            login_stats = []
+
+            for user in users:
+                # Count the number of logins for each user
+                login_count = user_logged_in.receivers.count(receiver(user_logged_in, sender=user.__class__))
+
+                # Get the login data for each user
+                user_login_data = {
+                    'user_id': user.id,
+                    'username': user.username,
+                    'login_count': login_count,
+                    'last_login': user.last_login,
+                }
+
+                # Append user login data to the list
+                login_stats.append(user_login_data)
+
+            return Response(login_stats, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@receiver(user_logged_in)
+def set_last_login(sender, user, request, **kwargs):
+    # Update the last_login field to the current timestamp when the user logs in
+    user.last_login = timezone.now()
+    user.save()
