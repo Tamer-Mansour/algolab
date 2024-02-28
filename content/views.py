@@ -16,7 +16,6 @@ from django.shortcuts import get_object_or_404
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
-# @permission_classes([AllowAny])
 def add_chapter(request):
     user = get_user_from_token(request.headers)
     if user.role != User.ADMIN:
@@ -24,8 +23,6 @@ def add_chapter(request):
     try:
         if request.method == 'POST':
             title = request.data.get('title')
-
-            # Check if a chapter with the provided title already exists
             existing_chapter = Chapter.objects.filter(title=title).first()
             if existing_chapter:
                 return Response({'error': f'Chapter with title "{title}" already exists'},
@@ -42,7 +39,6 @@ def add_chapter(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def get_chapters(request):
     try:
         if request.method == 'GET':
@@ -56,13 +52,11 @@ def get_chapters(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def list_chapters_with_details(request):
     chapters = Chapter.objects.all()
     serialized_data = []
     for chapter in chapters:
         chapter_data = ChapterSerializer(chapter).data
-        # chapter_data['lessons'] = LessonSerializer(chapter.get_lessons(), many=True).data
         chapter_data['challenges'] = CodingChallengeSerializer(chapter.get_challenges(), many=True).data
         serialized_data.append(chapter_data)
     return Response(serialized_data)
@@ -71,7 +65,6 @@ def list_chapters_with_details(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def get_chapter_with_challenges_by_id(request, chapter_id):
     try:
         chapter = Chapter.objects.prefetch_related('codingchallenge_set').get(pk=chapter_id)
@@ -88,9 +81,6 @@ def get_chapter_with_challenges_by_id(request, chapter_id):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
-# @authentication_classes([UserAuthentication])
-# @permission_classes([IsAuthenticated])
 def get_chapter_by_id(request, chapter_id):
     try:
         chapter = Chapter.objects.get(pk=chapter_id)
@@ -105,7 +95,6 @@ def get_chapter_by_id(request, chapter_id):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['PUT'])
-# @permission_classes([AllowAny])
 def edit_chapter(request, chapter_id):
     user = get_user_from_token(request.headers)
     if user.role != User.ADMIN:
@@ -126,7 +115,6 @@ def edit_chapter(request, chapter_id):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
-# @permission_classes([AllowAny])
 def delete_chapter(request, chapter_id):
     user = get_user_from_token(request.headers)
     if user.role != User.ADMIN:
@@ -145,7 +133,6 @@ def delete_chapter(request, chapter_id):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
-# @permission_classes([AllowAny])
 def add_coding_challenge(request):
     try:
         user = get_user_from_token(request.headers)
@@ -157,7 +144,6 @@ def add_coding_challenge(request):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                # If serializer is not valid, return detailed validation errors
                 return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -166,7 +152,6 @@ def add_coding_challenge(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def get_coding_challenges(request):
     try:
         if request.method == 'GET':
@@ -180,7 +165,6 @@ def get_coding_challenges(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def get_coding_challenge_by_id(request, challenge_id):
     try:
         coding_challenge = CodingChallenge.objects.get(pk=challenge_id)
@@ -195,7 +179,6 @@ def get_coding_challenge_by_id(request, challenge_id):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['PUT'])
-# @permission_classes([AllowAny])
 def edit_coding_challenge(request, challenge_id):
     user = get_user_from_token(request.headers)
     if user.role != User.ADMIN:

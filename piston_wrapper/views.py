@@ -10,8 +10,6 @@ from users.models import User
 PISTON_SERVER_BASE_URL = "http://localhost:2000/api/v2/"
 
 
-# @authentication_classes([UserAuthentication])
-# @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_available_packages(request):
@@ -26,7 +24,6 @@ def get_available_packages(request):
 @authentication_classes([UserAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-# @permission_classes([AllowAny])
 def get_runtimes(request):
     runtimes_endpoint = PISTON_SERVER_BASE_URL + "runtimes"
     try:
@@ -40,7 +37,6 @@ def get_runtimes(request):
 @permission_classes([IsAuthenticated])
 @csrf_exempt
 @api_view(['POST'])
-# @permission_classes([AllowAny])
 def install_package(request):
     packages_endpoint = PISTON_SERVER_BASE_URL + "packages"
     try:
@@ -58,7 +54,6 @@ def install_package(request):
 @permission_classes([IsAuthenticated])
 @csrf_exempt
 @api_view(['DELETE'])
-# @permission_classes([AllowAny])
 def uninstall_package(request):
     user = get_user_from_token(request.headers)
     if user.role != User.ADMIN:

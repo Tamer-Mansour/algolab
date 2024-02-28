@@ -97,7 +97,6 @@ def get_users_by_role(request, role):
             return Response({"error": "You are not authorized to perform this action."},
                             status=status.HTTP_403_FORBIDDEN)
         users = User.objects.filter(role=role)
-        # Manually select the desired fields
         users_data = [
             {
                 'id': user.id,
@@ -121,8 +120,6 @@ def get_users_by_role(request, role):
 def update_user(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
-        
-        # Extract only the allowed fields from request.data
         allowed_fields = ['first_name', 'last_name', 'email', 'role', 'date_of_birth', 'avatar', 'description', 'mobile', 'social_media_url', 'location']
         data_to_update = {field: request.data.get(field) for field in allowed_fields if field in request.data}
         
@@ -161,10 +158,6 @@ def delete_user(request, user_id):
 @api_view(['GET'])
 def get_user_by_id(request, user_id):
     try:
-        # user = get_user_from_token(request.headers)
-        # if user.role != User.ADMIN:
-        #     return Response({"error": "You are not authorized to perform this action."},
-        #                     status=status.HTTP_403_FORBIDDEN)
         user = User.objects.get(pk=user_id)
         user_data = {
             'id': user.id,
@@ -199,23 +192,16 @@ class LoginStatsAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Ensure that the authenticated user has the permission to view login stats
         if request.user.role != User.ADMIN:
             return Response({"error": "You are not authorized to perform this action."},
                             status=status.HTTP_403_FORBIDDEN)
 
         try:
-            # Get all users
             users = User.objects.all()
-
-            # Initialize a dictionary to store login data for each user
             login_stats = []
 
             for user in users:
-                # Count the number of logins for each user
                 login_count = user_logged_in.receivers.count(receiver(user_logged_in, sender=user.__class__))
-
-                # Get the login data for each user
                 user_login_data = {
                     'user_id': user.id,
                     'username': user.username,
@@ -223,7 +209,6 @@ class LoginStatsAPIView(views.APIView):
                     'last_login': user.last_login,
                 }
 
-                # Append user login data to the list
                 login_stats.append(user_login_data)
 
             return Response(login_stats, status=status.HTTP_200_OK)
@@ -234,6 +219,5 @@ class LoginStatsAPIView(views.APIView):
 
 @receiver(user_logged_in)
 def set_last_login(sender, user, request, **kwargs):
-    # Update the last_login field to the current timestamp when the user logs in
     user.last_login = timezone.now()
     user.save()
