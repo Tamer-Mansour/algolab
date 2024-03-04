@@ -100,6 +100,7 @@ def get_users_by_role(request, role):
         users_data = [
             {
                 'id': user.id,
+                'avatar': user.avatar.url,
                 'username': user.username,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
@@ -221,3 +222,42 @@ class LoginStatsAPIView(views.APIView):
 def set_last_login(sender, user, request, **kwargs):
     user.last_login = timezone.now()
     user.save()
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_username_availability(request, username):
+    try:
+        existing_user = User.objects.get(username=username)
+        return Response({"available": False, "message": "Username already exists. Please choose a different one."},
+                        status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"available": True, "message": "Username is available."},
+                        status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+
+from django.contrib.auth.hashers import make_password
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    try:
+        user = get_user_from_token(request.headers)
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+
+        if not check_password(current_password, user.password):
+            return Response({"error": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.password = make_password(new_password)
+        user.save()
+
+        return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
